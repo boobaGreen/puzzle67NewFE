@@ -42,6 +42,7 @@ const FreeMode = () => {
   const [privateKey, setPrivateKey] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [matchFound, setMatchFound] = useState<boolean>(false);
+  const [rawPrivateKey, setRawPrivateKey] = useState<string>("");
 
   const handleChange = (index: number, newValue: string) => {
     const newValues = [...values];
@@ -64,6 +65,7 @@ const FreeMode = () => {
 
       setPrivateKey(keyPair.toWIF());
       setAddress(btcAddress || "");
+      setRawPrivateKey(paddedHex);
 
       console.log("Chiave privata:", keyPair.toWIF());
       console.log("Indirizzo pubblico:", btcAddress);
@@ -81,7 +83,7 @@ const FreeMode = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center p-10 space-y-4">
+    <div className="flex flex-col justify-center items-center p-1 space-y-4">
       <div className="flex justify-center custom-lg:justify-start space-x-4">
         <HexBox
           initial={values[0]}
@@ -89,7 +91,7 @@ const FreeMode = () => {
           onChange={(value: string) => handleChange(0, value)}
         />
       </div>
-      <div className="grid grid-cols-4 gap-4 custom-lg:flex custom-lg:space-x-4">
+      <div className="grid grid-cols-4 gap-4 custom-lg:flex custom-lg:space-x-4 mb-8">
         {[...Array(16)].map((_, i) => (
           <HexBox
             key={i + 1}
@@ -99,30 +101,37 @@ const FreeMode = () => {
           />
         ))}
       </div>
-      <CTAButton onClick={handleCTAButtonClick} />
-      <div className="mt-4 text-center">
-        <p>
-          <strong>Chiave privata:</strong> {privateKey}
-        </p>
-        <p>
-          <strong>Indirizzo pubblico:</strong> {address}
-        </p>
-        <p>
-          <strong>Indirizzo target:</strong> {targetPublicKey}
-        </p>
-        {matchFound && (
-          <p className="text-green-500">
-            La chiave pubblica è stata trovata! Crea un wallet BTC con la chiave
-            WIF fornita, ad esempio con Electrum Wallet, e ritira il premio di
-            6.7 BTC.
-          </p>
-        )}
-        {!matchFound && (
-          <p className="text-red-500">
-            La chiave pubblica non è stata trovata!
-          </p>
-        )}
+
+      <div className="py-8">
+        <CTAButton onClick={handleCTAButtonClick} />
       </div>
+
+      {privateKey && address && (
+        <div className="text-center">
+          <p>
+            <strong>Chiave privata (Hex):</strong>
+            <span style={{ color: "black" }}>{rawPrivateKey.slice(0, 47)}</span>
+            <span style={{ color: "white", background: "black" }}>
+              {rawPrivateKey.slice(47)}
+            </span>
+          </p>
+          <p>
+            <strong>Chiave privata (WIF):</strong> {privateKey}
+          </p>
+          <p className="mt-4">
+            <strong>Indirizzo pubblico:</strong> {address}
+          </p>
+          {matchFound && (
+            <p className="text-black font-bold mt-4 uppercase">
+              Successo! Crea un wallet BTC con la chiave WIF fornita, ad esempio
+              con Electrum Wallet, e ritira il premio di 6.7 BTC.
+            </p>
+          )}
+          {!matchFound && (
+            <p className="text-black font-bold mt-4 uppercase">Prova ancora!</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

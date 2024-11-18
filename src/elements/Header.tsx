@@ -37,6 +37,8 @@ export default function Header() {
     ? (btcAmount * btcPriceEUR).toFixed(0)
     : "Loading...";
 
+  const targetPublicKey = import.meta.env.VITE_TARGET_PUBLIC_KEY; // Use the targetPublicKey from environment variables
+
   return (
     <header>
       <div className="flex justify-between p-3">
@@ -58,6 +60,11 @@ export default function Header() {
         <div className="text-xl lg:text-3xl my-4">
           {`$${usdValue} / €${eurValue}`}
         </div>
+      </div>
+      <div className="flex w-full justify-center">
+        <p>
+          <strong>Indirizzo target:</strong> {targetPublicKey}
+        </p>
       </div>
       <SwitchSelection />
     </header>
