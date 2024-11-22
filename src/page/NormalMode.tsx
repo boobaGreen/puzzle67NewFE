@@ -1,5 +1,5 @@
 // FILE: NormalMode.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HexBox from "../components/HexBox";
 import HexBoxNoArrow from "../components/HexBoxNoArrow";
 import CTAButton from "../components/CTAButton";
@@ -27,7 +27,12 @@ const xValues = ["X"];
 
 const NormalMode = () => {
   const [values, setValues] = useState(Array(13).fill("0"));
-  values[0] = "4";
+
+  useEffect(() => {
+    const newValues = [...values];
+    newValues[0] = "4";
+    setValues(newValues);
+  }, []);
 
   const handleChange = (index: number, newValue: string) => {
     const newValues = [...values];
