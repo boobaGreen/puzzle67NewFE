@@ -1,20 +1,23 @@
+// FILE: src/elements/Header.tsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { IconContext } from "react-icons";
 import { LuPuzzle } from "react-icons/lu";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { useAuth } from "../contexts/AuthContext";
 import SwitchSelection from "./SwitchSelection";
+import axiosInstance from "../utility/axiosInstance";
 
 export default function Header() {
   const [btcPriceUSD, setBtcPriceUSD] = useState<number | null>(null);
   const [btcPriceEUR, setBtcPriceEUR] = useState<number | null>(null);
+  const { address, isConnected } = useAccount();
+  const { login } = useAuth();
 
   useEffect(() => {
     const fetchBtcPrice = async () => {
       try {
-        const response = await axios.get(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur"
-        );
+        const response = await axiosInstance.get("/btc-price");
         const data = response.data as { bitcoin: { usd: number; eur: number } };
         setBtcPriceUSD(data.bitcoin.usd);
         setBtcPriceEUR(data.bitcoin.eur);
@@ -24,10 +27,16 @@ export default function Header() {
     };
 
     fetchBtcPrice();
-    const interval = setInterval(fetchBtcPrice, 180000); // Update every minute
+    const interval = setInterval(fetchBtcPrice, 180000); // Update every 3 minutes
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
+
+  useEffect(() => {
+    if (isConnected && address) {
+      login(address);
+    }
+  }, [isConnected, address, login]);
 
   const btcAmount = 6.7;
   const usdValue = btcPriceUSD
@@ -47,7 +56,6 @@ export default function Header() {
             <LuPuzzle />
           </div>
         </IconContext.Provider>
-
         <ConnectButton
           label="ConnectMe!"
           showBalance={false}
